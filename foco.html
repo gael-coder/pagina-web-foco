@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Foco</title>
+  <style>
+    /* CSS para centrar el contenido en la pantalla */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      color: #4a90e2;
+      margin-bottom: 20px;
+    }
+    #estadoFoco {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+    #botonFoco {
+      padding: 10px 20px;
+      font-size: 1em;
+      color: #fff;
+      background-color: #4a90e2;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #botonFoco:hover {
+      background-color: #357abd;
+    }
+    #botonFoco:active {
+      background-color: #2e6da4;
+    }
+  </style>
+ <script>
+  let focoEncendido = false;
+
+  function toggleFoco() {
+    const estado = focoEncendido ? "off" : "on";
+    const url = 'https://api.particle.io/v1/devices/e00fce68ce6885f40a76bd65/led';
+    const token = 'c4f84b358e2a812da35b45eef05d801d12b634c6';
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `access_token=${token}&params=${estado}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.return_value === 1) {
+        focoEncendido = !focoEncendido;
+        document.getElementById("estadoFoco").innerText = focoEncendido ? "Foco encendido" : "Foco apagado";
+        document.getElementById("botonFoco").innerText = focoEncendido ? "Apagar" : "Encender";
+
+        // Recargar la página cuando el foco se apague
+       
+      } else {
+        window.location.reload();
+        console.error("Error al cambiar el estado del foco:", data);
+        //alert("Hubo un problema al cambiar el estado del foco.");
+      }
+    })
+    .catch(error => console.error("Error de conexión:", error));
+  }
+</script>
+
+</head>
+<body>
+  <h1>Control de Foco</h1>
+  <p id="estadoFoco">Foco apagado</p>
+  <button id="botonFoco" onclick="toggleFoco()">Encender</button>
+</body>
+</html>
+
